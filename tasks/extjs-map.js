@@ -32,10 +32,10 @@ module.exports = function(grunt) {
       var map = file.src.reduce(function(map, src) {
         var name = path.basename(grunt.file.isDir(src) ? src : path.dirname(src));
         var ns = normalizeNs(name, src);
-        var rootPath = typeof rootPath === 'function' ? rootPath(name, src, ns) : rootPath;
+        var root = typeof rootPath === 'function' ? rootPath(name, src, ns) : rootPath;
 
         if (ns) {
-          map[ns] = normalizePath ? normalizePath(name, src, rootPath, ns) : prefixPath(rootPath, src);
+          map[ns] = normalizePath ? normalizePath(name, src, root, ns) : prefixPath(root, src);
 
           counter++;
           grunt.verbose.writeln('ExtJS Path added as %s : %s.', ns, map[ns]);

@@ -1,4 +1,4 @@
-# grunt-extjs v0.1.0
+# grunt-extjs v0.1.1
 > Generate ExtJS paths & dependencies.
 
 
@@ -172,6 +172,7 @@ grunt.initConfig({
 
 ## Release History
 
+ * 2015-01-11   v0.1.1   Fix `rootPath` option.
  * 2015-01-11   v0.1.0   Work in progress, not yet officially released.
 
 
