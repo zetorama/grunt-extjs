@@ -1,5 +1,43 @@
 'use strict';
 
+var finishJob = function(grunt, options, files) {
+  var num;
+
+  grunt.verbose.writeln('Console log output:\n', files.console.join('\n').cyan);
+
+  var failed = Object.keys(files.failed);
+  num = failed.length;
+  if (num) {
+    grunt.log.error('%s %s not been created, so did not hit dependency list:',
+                    num,
+                    grunt.util.pluralize(num, 'Class has/Classes have'));
+    failed.forEach(function(cls) {
+      grunt.log.error('-\t%s : ' + '%s'.cyan, cls, files.failed[cls]);
+    });
+  }
+
+  num = files.missed.length;
+  if (num) {
+    grunt.log.error('%s %s requested, but %s exist:',
+                    num,
+                    grunt.util.pluralize(num, 'file was/files were'),
+                    grunt.util.pluralize(num, 'does not/don\'t'));
+    files.missed.forEach(function(file) {
+      grunt.log.error('-\t%s'.cyan, file);
+    });
+  }
+
+  grunt.verbose.writeln('Compiling dependencies through options.compileDeps().');
+  options.compileDeps(files);
+
+  grunt.verbose.ok('Dependencies catched in total:');
+  grunt.verbose.ok('classes - %s', files.classes.length);
+  grunt.verbose.ok('scripts - %s', files.scripts.length);
+  grunt.verbose.ok('xhr     - %s', files.xhr.length);
+
+  grunt.log.notverbose.ok('%s ExtJS Classes gathered.', files.classes.length);
+};
+
 
 module.exports = function(grunt) {
   var fs = require('fs');
@@ -20,11 +58,12 @@ module.exports = function(grunt) {
       compileDeps: function(files) {
         var cfg = ['extjs', this.target, 'deps'].join('.');
         grunt.config.set(cfg, files);
-        grunt.verbose.ok('ExtJS dependencies are stored in "%s" variable.', cfg);
+        grunt.log.ok('ExtJS dependencies are stored in "%s" variable.', cfg);
       }.bind(this)
     });
 
     var done = this.async();
+    var tid;
 
     var extjs = path.join(options.cwd, 'ext-' + Math.floor(Math.random() * 1000000) + '.js');
     var extDir = path.join(options.cwd, options.extDir, 'src');
@@ -49,34 +88,20 @@ module.exports = function(grunt) {
     // console.info(spawnOpts.args);
     grunt.verbose.subhead('Spawning ExtJS App.');
     var child = grunt.util.spawn(spawnOpts, function(error, result, code) {
-      var files, failed;
+      var files;
+      clearTimeout(tid);
       grunt.verbose.ok('Spawning done. Processing result.');
       grunt.file.delete(extjs);
 
       if (!error) {
-        files = JSON.parse(result.stdout);
-        failed = Object.keys(files.failed);
-
-        grunt.verbose.writeln('Console output:\n', files.console.join('\n').cyan);
-
-        if (failed.length) {
-          grunt.log.error('%s ' +
-                          grunt.util.pluralize(failed.length, 'Class has/Classes have') +
-                          ' not been created, so did not hit dependency list:', failed.length);
-          failed.forEach(function(cls) {
-            grunt.log.error('-\t%s : ' + '%s'.cyan, cls, files.failed[cls]);
-          });
+        grunt.log.debug(result.stdout);
+        try {
+          files = JSON.parse(result.stdout);
+          finishJob(grunt, options, files);
+        } catch (err) {
+          grunt.fail.warn('Can not parse result from spawned ExtJS App. ' + err.message);
         }
 
-        grunt.verbose.writeln('Compiling dependencies through options.compileDeps().');
-        options.compileDeps(files);
-
-        grunt.verbose.ok('Dependencies catched in total:');
-        grunt.verbose.ok('classes - %s', files.classes.length);
-        grunt.verbose.ok('scripts - %s', files.scripts.length);
-        grunt.verbose.ok('xhr     - %s', files.xhr.length);
-
-        grunt.log.notverbose.ok('%s ExtJS Classes gathered.', files.classes.length);
       } else {
         grunt.fail.warn('Spawned ExtJS App has failed with code ' + code + '.');
       }
@@ -85,10 +110,10 @@ module.exports = function(grunt) {
     });
 
     child.stderr.on('data', function(data) {
-      grunt.verbose.errorlns(String(data));
+      grunt.verbose.error(String(data));
     });
 
-    setTimeout(function() {
+    tid = setTimeout(function() {
       child.kill();
       grunt.fail.warn('Spawned ExtJS App is killed by timeout.');
       grunt.file.delete(extjs);

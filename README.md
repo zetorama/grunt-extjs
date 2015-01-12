@@ -1,4 +1,4 @@
-# grunt-extjs v0.1.1
+# grunt-extjs v0.1.2
 > Generate ExtJS paths & dependencies.
 
 
@@ -79,10 +79,11 @@ Type: `Function`
 Default: (built-in)
 
 Callback to deal with gathered dependencies. By default it setups `extjs.{target}.deps` option with passed `(files)`, including:
-  * `classes` [path]
-  * `scripts` [uri]
-  * `xhr` [uri]
-  * `failed` {class: path}
+  * `classes` [path] - Created Classes list
+  * `scripts` [uri] - Files requested via `Ext.Loader.loadScript()`
+  * `xhr` [uri] - Ajax Requests list
+  * `missed` [path] - Requested, but not existed files
+  * `failed` {class: path} - Existed, defined, but not created Classes
 
 ### Usage examples
 
@@ -172,8 +173,10 @@ grunt.initConfig({
 
 ## Release History
 
- * 2015-01-11   v0.1.1   Fix `rootPath` option.
- * 2015-01-11   v0.1.0   Work in progress, not yet officially released.
-
-
-
+ * 2015-01-11 **v0.1.2**
+   - _extjs-deps_: Fix kill by timeout on multiple targets.
+   - _extjs-deps_: Ignore non-existed files (see `files.missed`)
+ * 2015-01-11 **v0.1.1**
+   - _extjs-map_: Fix `rootPath` option.
+ * 2015-01-11 **v0.1.0**
+   - Work in progress, not yet officially released.

@@ -23,7 +23,7 @@ module.exports = function(grunt) {
     var compileMap = options.compileMap || function(map) {
       var cfg = ['extjs', this.target, 'map'].join('.');
       grunt.config.set(cfg, map);
-      grunt.verbose.ok('ExtJS Paths are stored in "%s" variable.', cfg);
+      grunt.log.ok('ExtJS Paths are stored in "%s" variable.', cfg);
     }.bind(this);
 
     this.files.forEach(function(file) {
