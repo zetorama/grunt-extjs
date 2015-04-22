@@ -188,7 +188,7 @@ grunt.initConfig({
 
 ## Release History
 
- * 2015-01-11 **v0.1.2**
+ * 2015-04-22 **v0.1.3**
    - _extjs-deps_: Add `failOnMissed` & `failOnFailed` options.
  * 2015-01-11 **v0.1.2**
    - _extjs-deps_: Fix kill by timeout on multiple targets.
