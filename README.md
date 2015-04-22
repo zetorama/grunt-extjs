@@ -1,4 +1,4 @@
-# grunt-extjs v0.1.2
+# grunt-extjs v0.1.3
 > Generate ExtJS paths & dependencies.
 
 
@@ -188,6 +188,8 @@ grunt.initConfig({
 
 ## Release History
 
+ * 2015-01-11 **v0.1.2**
+   - _extjs-deps_: Add `failOnMissed` & `failOnFailed` options.
  * 2015-01-11 **v0.1.2**
    - _extjs-deps_: Fix kill by timeout on multiple targets.
    - _extjs-deps_: Ignore non-existed files (see `files.missed`)
