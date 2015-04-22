@@ -14,6 +14,9 @@ var finishJob = function(grunt, options, files) {
     failed.forEach(function(cls) {
       grunt.log.error('-\t%s : ' + '%s'.cyan, cls, files.failed[cls]);
     });
+    if (options.failOnFailed) {
+      throw new Error('Check failed Classes.');
+    }
   }
 
   num = files.missed.length;
@@ -25,6 +28,9 @@ var finishJob = function(grunt, options, files) {
     files.missed.forEach(function(file) {
       grunt.log.error('-\t%s'.cyan, file);
     });
+    if (options.failOnMissed) {
+      throw new Error('Check missed files.');
+    }
   }
 
   grunt.verbose.writeln('Compiling dependencies through options.compileDeps().');
@@ -55,6 +61,8 @@ module.exports = function(grunt) {
       extFile: 'ext-debug.js',
       injectEnv: asset('lib/inject/env.js'),
       injectFooter: asset('lib/inject/footer.js'),
+      failOnFailed: false,
+      failOnMissed: false,
       compileDeps: function(files) {
         var cfg = ['extjs', this.target, 'deps'].join('.');
         grunt.config.set(cfg, files);
@@ -97,9 +105,15 @@ module.exports = function(grunt) {
         grunt.log.debug(result.stdout);
         try {
           files = JSON.parse(result.stdout);
-          finishJob(grunt, options, files);
         } catch (err) {
           grunt.fail.warn('Can not parse result from spawned ExtJS App. ' + err.message);
+        }
+
+        try {
+          // jshint -W030
+          files && finishJob(grunt, options, files);
+        } catch (err) {
+          grunt.fail.warn('There is unexpected result from spawned ExtJS App. ' + err.message);
         }
 
       } else {

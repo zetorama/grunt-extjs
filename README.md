@@ -23,7 +23,9 @@ grunt.loadNpmTasks('grunt-extjs');
 ## ExtJS Deps Task
 _Run this task with the `grunt extjs-deps` command._
 
-This task will modify ExtJS core file (with some black magic injections) to be run by Node. Then your ExtJS App will be spawned (i.e. instantiated by Node) to find all of your dependencies by `Ext.Loader`. As a result you will get whole Class files list in the right order. As well as static scripts URIs (requested by `Ext.Loader.loadScript`) and Ajax URIs (requested by `Ext.data.Connection`).
+This task will copy & modify ExtJS core file (with some black magic injections) to be run by Node. Then your ExtJS App will be spawned (i.e. instantiated by Node) to find all of your dependencies by `Ext.Loader`. As a result you will get whole Class files list in the right order. As well as static scripts URIs (requested by `Ext.Loader.loadScript`) and Ajax URIs (requested by `Ext.data.Connection`).
+
+_Note, it was tested only on ExtJS 4.2.1 — Please, report if there are issues with other versions._
 
 Task targets, files and options may be specified according to the grunt [Configuring tasks](http://gruntjs.com/configuring-tasks) guide.
 
@@ -51,13 +53,13 @@ Default: (built-in)
 File with custom ExtJS overrides. Used to run ExtJS by Node & actually catch dependencies.
 
 #### cwd
-Type: `String`
+Type: `String`  
 Default: `process.cwd()`
 
 Root path for all scripts paths. Results would be relative to this.
 
 #### appRoot
-Type: `String`
+Type: `String`  
 Default: `""`
 
 Your App root path. Usually, where your `index.html` is located.
@@ -73,6 +75,18 @@ Type: `String`
 Default: `"ext-debug.js"`
 
 ExtJS Core file to be used. Use `"ext-all.js"` if you don't want catch any `Ext.*` Classes.
+
+#### failOnFailed
+Type: `Boolean`  
+Default: `false`
+
+Fail task if some Classes have not been created
+
+#### failOnMissed
+Type: `Boolean`  
+Default: `false`
+
+Fail task if some Classes were required, but don't exist
 
 #### compileDeps
 Type: `Function`  
@@ -94,7 +108,8 @@ grunt.initConfig({
     options: {
       extDir: 'src/vendor/extjs',
       extFile: 'ext-all.js',
-      appRoot: 'src'
+      appRoot: 'src',
+      failOnMissed: true
     },
     app: {
       src: 'src/app/index.js'
@@ -120,19 +135,19 @@ Also note that running grunt with the `--verbose` flag will output some extra in
 ### Options
 
 #### normalizeNs
-Type: `Function`
+Type: `Function`  
 Default: (built-in)
 
 Call to normalize namespace, passing `(dirname, filepath)`. By default it converts `my-dir-name_one` to `MyDirName_one`.
 
 #### normalizePath
-Type: `Function`
+Type: `Function`  
 Default: (built-in)
 
 Call to normalize path, passing `(dirname, filepath, rootPath, namespace)`. By default it joins as `rootPath/diname`.
 
 #### rootPath
-Type: `String|Function`
+Type: `String|Function`  
 Default: ''
 
 Path prefix to be added to each generated path. If a Function, then called each time before path is normalized, passing `(dirname, filepath, namespace)`.
